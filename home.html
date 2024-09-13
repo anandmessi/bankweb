@@ -62,6 +62,7 @@
         <a href="services.html">Services</a>
         <a href="contact.html">Contact</a>
         <a href="login.html">Login</a>
+        <a href="credits.html">Credits</a> <!-- Added Credits Link -->
     </nav>
     
     <div class="container">
@@ -244,9 +245,9 @@
         function restartGame() {
             boardState = ['', '', '', '', '', '', '', '', ''];
             cells.forEach(cell => cell.textContent = '');
+            gameActive = true;
             currentPlayer = 'X';
             statusDisplay.textContent = `Player X's turn`;
-            gameActive = true;
             gameOverDisplay.style.display = 'none';
             board.style.display = 'grid';
         }
