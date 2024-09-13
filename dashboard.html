@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Pinnacle Bank</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome, <span id="user-name">[User]</span></h1>
+    </header>
+    
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="logout.html">Logout</a>
+        <a href="credits.html">Credits</a>
+    </nav>
+    
+    <div class="container">
+        <section>
+            <h2>Account Overview</h2>
+            <div class="account-summary">
+                <h3>Account Balance</h3>
+                <p id="balance">$0.00</p>
+
+                <h3>Recent Transactions</h3>
+                <table id="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Transactions will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="account-actions">
+                <h3>Deposit/Withdraw Money</h3>
+                <label for="transaction-amount">Amount:</label>
+                <input type="number" id="transaction-amount" name="amount" required>
+
+                <button id="deposit-button">Deposit</button>
+                <button id="withdraw-button">Withdraw</button>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <!-- No copyright section here -->
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userNameElement = document.getElementById('user-name');
+            const balanceElement = document.getElementById('balance');
+            const transactionTableBody = document.getElementById('transaction-table').getElementsByTagName('tbody')[0];
+            const depositButton = document.getElementById('deposit-button');
+            const withdrawButton = document.getElementById('withdraw-button');
+            const transactionAmountInput = document.getElementById('transaction-amount');
+
+            // Get logged-in user email
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (!loggedInUser) {
+                window.location.href = 'login.html'; // Redirect to login if not logged in
+                return;
+            }
+
+            userNameElement.textContent = loggedInUser;
+
+            // Initialize balance and transactions
+            let userData = JSON.parse(localStorage.getItem(loggedInUser)) || { balance: 0, transactions: [] };
+            updateBalance(userData.balance);
+            updateTransactions(userData.transactions);
+
+            depositButton.addEventListener('click', function() {
+                handleTransaction('deposit');
+            });
+
+            withdrawButton.addEventListener('click', function() {
+                handleTransaction('withdraw');
+            });
+
+            function handleTransaction(type) {
+                const amount = parseFloat(transactionAmountInput.value);
+
+                if (isNaN(amount) || amount <= 0) {
+                    alert('Please enter a valid amount.');
+                    return;
+                }
+
+                let userData = JSON.parse(localStorage.getItem(loggedInUser)) || { balance: 0, transactions: [] };
+
+                if (type === 'withdraw' && amount > userData.balance) {
+                    alert('Insufficient balance.');
+                    return;
+                }
+
+                // Update balance
+                if (type === 'deposit') {
+                    userData.balance += amount;
+                } else if (type === 'withdraw') {
+                    userData.balance -= amount;
+                }
+
+                // Add to transactions
+                const transaction = {
+                    date: new Date().toISOString().split('T')[0],
+                    description: type.charAt(0).toUpperCase() + type.slice(1),
+                    amount: amount.toFixed(2) // Ensure amount is a string with two decimal places
+                };
+                userData.transactions.push(transaction);
+
+                // Save updated data
+                localStorage.setItem(loggedInUser, JSON.stringify(userData));
+
+                // Update balance and transactions in the UI
+                updateBalance(userData.balance);
+                updateTransactions(userData.transactions);
+
+                // Clear form
+                transactionAmountInput.value = '';
+            }
+
+            function updateBalance(balance) {
+                balanceElement.textContent = `$${parseFloat(balance).toFixed(2)}`;
+            }
+
+            function updateTransactions(transactions) {
+                transactionTableBody.innerHTML = ''; // Clear existing rows
+                transactions.forEach(transaction => {
+                    const row = transactionTableBody.insertRow();
+                    row.insertCell(0).textContent = transaction.date;
+                    row.insertCell(1).textContent = transaction.description;
+                    
+                    // Check if amount is valid before formatting
+                    const amount = parseFloat(transaction.amount);
+                    if (!isNaN(amount)) {
+                        row.insertCell(2).textContent = `$${amount.toFixed(2)}`;
+                    } else {
+                        row.insertCell(2).textContent = '$0.00'; // Default value if amount is invalid
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

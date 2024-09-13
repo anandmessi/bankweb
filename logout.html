@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout | Pinnacle Bank</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Logging Out</h1>
+    </header>
+    
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+        <a href="credits.html">Credits</a>
+    </nav>
+    
+    <div class="container">
+        <section>
+            <p>We are logging you out...</p>
+        </section>
+    </div>
+    
+    <footer>
+        <!-- No copyright section here -->
+    </footer>
+
+    <script>
+        // Clear session data
+        localStorage.removeItem('loggedInUser');
+        
+        // Redirect to login page after logout
+        window.location.href = 'login.html';
+    </script>
+</body>
+</html>

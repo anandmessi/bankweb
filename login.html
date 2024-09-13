@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Pinnacle Bank</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Login to Pinnacle Bank</h1>
+    </header>
+    
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="active">Login</a>
+        <a href="credits.html">Credits</a>
+    </nav>
+    
+    <div class="container">
+        <section>
+            <form id="login-form">
+                <label for="email">Email:</label>
+                <input type="email" id="login-email" name="email" required>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+                
+                <input type="submit" value="Login">
+            </form>
+            <p>Don't have an account? <a href="register.html">Register here</a>.</p>
+        </section>
+    </div>
+    
+    <footer>
+        <!-- No copyright section here -->
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            // Retrieve user data from local storage
+            const user = JSON.parse(localStorage.getItem(email));
+
+            if (user && user.password === password) {
+                alert('Login successful!');
+                
+                // Store session data
+                localStorage.setItem('loggedInUser', email);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Incorrect email or password.');
+            }
+        });
+    </script>
+</body>
+</html>

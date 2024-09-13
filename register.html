@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Pinnacle Bank</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Register for Pinnacle Bank</h1>
+    </header>
+    
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html">Login</a>
+        <a href="register.html" class="active">Register</a>
+        <a href="credits.html">Credits</a>
+    </nav>
+    
+    <div class="container">
+        <section>
+            <form id="register-form">
+                <label for="email">Email:</label>
+                <input type="email" id="register-email" name="email" required>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="register-password" name="password" required>
+                
+                <input type="submit" value="Register">
+            </form>
+            <p>Already have an account? <a href="login.html">Login here</a>.</p>
+        </section>
+    </div>
+    
+    <footer>
+        <!-- No copyright section here -->
+    </footer>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+
+            // Check if the email already exists
+            if (localStorage.getItem(email)) {
+                alert('Email already registered. Please use a different email.');
+                return;
+            }
+
+            // Save user data in local storage
+            localStorage.setItem(email, JSON.stringify({ password }));
+
+            alert('Registration successful!');
+
+            // Redirect to login page
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

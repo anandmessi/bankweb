@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Pinnacle Bank</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles for Tic-Tac-Toe */
+        .game-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #eee;
+            border: 1px solid #333;
+            font-size: 36px;
+            line-height: 100px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .cell:hover {
+            background-color: #ddd;
+        }
+        .status {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .game-over, .game-start {
+            display: none;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .game-start button, .game-over button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .stats {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Pinnacle Bank</h1>
+    </header>
+    
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="services.html">Services</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html">Login</a>
+    </nav>
+    
+    <div class="container">
+        <section>
+            <h2>Your Trusted Banking Partner</h2>
+            <p>We provide secure and innovative banking solutions for individuals and businesses.</p>
+            <a href="services.html" class="btn">Explore Our Services</a>
+        </section>
+
+        <!-- Tic-Tac-Toe Section -->
+        <section class="game-container">
+            <h2>Play Tic-Tac-Toe</h2>
+            <p class="status" id="game-status">Player X's turn</p>
+            <div class="board" id="game-board">
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+            </div>
+            <div class="game-over">
+                <p id="game-over-message"></p>
+                <button id="restart-button">Replay</button>
+            </div>
+            <div class="game-start">
+                <button id="start-button">Start Game</button>
+            </div>
+            <div class="stats">
+                <p>Player X Wins: <span id="player-wins">0</span></p>
+                <p>AI Wins: <span id="ai-wins">0</span></p>
+                <p>Draws: <span id="draws">0</span></p>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <!-- No copyright section here -->
+    </footer>
+
+    <script>
+        const board = document.getElementById('game-board');
+        const cells = Array.from(document.querySelectorAll('[data-cell]'));
+        const statusDisplay = document.getElementById('game-status');
+        const gameOverDisplay = document.querySelector('.game-over');
+        const restartButton = document.getElementById('restart-button');
+        const startButton = document.getElementById('start-button');
+
+        let boardState = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        // Load scores from localStorage or initialize to zero
+        let playerWins = parseInt(localStorage.getItem('playerWins')) || 0;
+        let aiWins = parseInt(localStorage.getItem('aiWins')) || 0;
+        let draws = parseInt(localStorage.getItem('draws')) || 0;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function checkWinner() {
+            let roundWon = false;
+            for (let i = 0; i <= 7; i++) {
+                const winCondition = winningConditions[i];
+                const a = boardState[winCondition[0]];
+                const b = boardState[winCondition[1]];
+                const c = boardState[winCondition[2]];
+                if (a === '' || b === '' || c === '') continue;
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+            if (roundWon) {
+                if (currentPlayer === 'X') {
+                    statusDisplay.textContent = 'Player X Wins!';
+                    playerWins++;
+                } else {
+                    statusDisplay.textContent = 'AI Wins!';
+                    aiWins++;
+                }
+                gameActive = false;
+                updateStats();
+                saveStats();
+                gameOverDisplay.style.display = 'block';
+                board.style.display = 'none';
+                return;
+            }
+            if (!boardState.includes('')) {
+                statusDisplay.textContent = 'Draw!';
+                draws++;
+                gameActive = false;
+                updateStats();
+                saveStats();
+                gameOverDisplay.style.display = 'block';
+                board.style.display = 'none';
+                return;
+            }
+        }
+
+        function handleClick(event) {
+            const cell = event.target;
+            const cellIndex = cells.indexOf(cell);
+            if (boardState[cellIndex] !== '' || !gameActive || currentPlayer !== 'X') return;
+            cell.textContent = currentPlayer;
+            boardState[cellIndex] = currentPlayer;
+            checkWinner();
+            if (gameActive) {
+                currentPlayer = 'O';
+                statusDisplay.textContent = `AI's turn`;
+                setTimeout(() => {
+                    if (gameActive) aiMove();
+                }, 500); // Simulate AI thinking time
+            } else {
+                currentPlayer = 'X';
+                statusDisplay.textContent = `Player X's turn`;
+            }
+        }
+
+        function aiMove() {
+            const bestMove = minimax(boardState, 'O').index;
+            boardState[bestMove] = 'O';
+            cells[bestMove].textContent = 'O';
+            checkWinner();
+            if (gameActive) {
+                currentPlayer = 'X';
+                statusDisplay.textContent = `Player X's turn`;
+            }
+        }
+
+        function minimax(boardState, player) {
+            const availableMoves = boardState.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
+
+            if (checkForWin(boardState, 'O')) return { index: null, score: 10 };
+            if (checkForWin(boardState, 'X')) return { index: null, score: -10 };
+            if (availableMoves.length === 0) return { index: null, score: 0 };
+
+            let bestMove = null;
+            let bestScore = (player === 'O') ? -Infinity : Infinity;
+
+            for (let index of availableMoves) {
+                boardState[index] = player;
+                const score = minimax(boardState, player === 'O' ? 'X' : 'O').score;
+                boardState[index] = '';
+
+                if (player === 'O') {
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = index;
+                    }
+                } else {
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestMove = index;
+                    }
+                }
+            }
+
+            return { index: bestMove, score: bestScore };
+        }
+
+        function checkForWin(boardState, player) {
+            return winningConditions.some(condition => {
+                const [a, b, c] = condition;
+                return boardState[a] === player && boardState[b] === player && boardState[c] === player;
+            });
+        }
+
+        function restartGame() {
+            boardState = ['', '', '', '', '', '', '', '', ''];
+            cells.forEach(cell => cell.textContent = '');
+            currentPlayer = 'X';
+            statusDisplay.textContent = `Player X's turn`;
+            gameActive = true;
+            gameOverDisplay.style.display = 'none';
+            board.style.display = 'grid';
+        }
+
+        function updateStats() {
+            document.getElementById('player-wins').textContent = playerWins;
+            document.getElementById('ai-wins').textContent = aiWins;
+            document.getElementById('draws').textContent = draws;
+        }
+
+        function saveStats() {
+            localStorage.setItem('playerWins', playerWins);
+            localStorage.setItem('aiWins', aiWins);
+            localStorage.setItem('draws', draws);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            cells.forEach(cell => cell.addEventListener('click', handleClick));
+            restartButton.addEventListener('click', restartGame);
+            startButton.addEventListener('click', () => {
+                document.querySelector('.game-start').style.display = 'none';
+                board.style.display = 'grid';
+            });
+        });
+    </script>
+</body>
+</html>
